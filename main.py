@@ -45,7 +45,7 @@ class LightningModel(pl.LightningModule):
         output2 = self.model(x2)
         output1 = F.normalize(output1, dim=1)
         output2 = F.normalize(output2, dim=1)
-        return output1, output2
+        return (output1, output2)
 
     def configure_optimizers(self):
         optimizers = torch.optim.SGD(self.parameters(), lr=0.001, weight_decay=0.001, momentum=0.9)

@@ -24,7 +24,9 @@ class GeM(torch.nn.Module):
         self.eps = eps
     
     def forward(self, x):
-        return torch.nn.functional.avg_pool2d(x.clamp(min=1e-6).pow(torch.nn.Parameter(torch.ones(1)*p)), (x.size(-2), x.size(-1))).pow(1./torch.nn.Parameter(torch.ones(1)*p)) 
+        self.p=torch.nn.Parameter(torch.ones(1)*3)
+        self.eps=1e-6
+        return torch.nn.functional.avg_pool2d(x.clamp(min=self.eps).pow(self.p), (x.size(-2), x.size(-1))).pow(self.p) 
 
 class LightningModel(pl.LightningModule):
     def __init__(self, val_dataset, test_dataset, descriptors_dim=512, num_preds_to_save=0, save_only_wrong_preds=True):

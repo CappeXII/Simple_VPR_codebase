@@ -45,7 +45,7 @@ class LightningModel(pl.LightningModule):
         features = self.model(images)
         pooled_features = self.pooling(features)
         descriptors = F.normalize(pooled_features, p=2, dim=1)
-        return descriptors
+        return descriptors
 
     def configure_optimizers(self):
         optimizers = torch.optim.SGD(self.parameters(), lr=0.001, weight_decay=0.001, momentum=0.9)

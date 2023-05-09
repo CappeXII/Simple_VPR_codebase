@@ -18,8 +18,8 @@ from datasets.train_dataset import TrainDataset
 
 
 class GeM(torch.nn.Module):
-    def _init_(self, p=3, eps=1e-6):
-        super(GeM,self)._init_()
+    def __init__(self, p=3, eps=1e-6):
+        super(GeM,self).__init__()
         self.p = torch.nn.Parameter(torch.ones(1)*p)
         self.eps = eps
     

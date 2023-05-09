@@ -24,8 +24,6 @@ class GeM(torch.nn.Module):
         self.eps = eps
     
     def forward(self, x):
-        self.p=torch.nn.Parameter(torch.ones(1)*3)
-        self.eps=1e-6
         return torch.nn.functional.avg_pool2d(x.clamp(min=self.eps).pow(self.p), (x.size(-2), x.size(-1))).pow(self.p) 
 
 class LightningModel(pl.LightningModule):

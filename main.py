@@ -24,7 +24,7 @@ class GeM(torch.nn.Module):
         self.eps = eps
     
     def forward(self, x):
-        return torch.nn.functional.avg_pool2d(x.clamp(min=1e-6).pow(3), (x.size(-2), x.size(-1))).pow(1./3) 
+        return torch.nn.functional.avg_pool2d(x.clamp(min=1e-6).pow(torch.nn.Parameter(torch.ones(1)*p)), (x.size(-2), x.size(-1))).pow(1./torch.nn.Parameter(torch.ones(1)*p)) 
 
 class LightningModel(pl.LightningModule):
     def __init__(self, val_dataset, test_dataset, descriptors_dim=512, num_preds_to_save=0, save_only_wrong_preds=True):
@@ -42,9 +42,7 @@ class LightningModel(pl.LightningModule):
         self.loss_fn = losses.ContrastiveLoss(pos_margin=0, neg_margin=1)
 
     def forward(self, images):
-        features = self.model(images)
-        pooled_features = self.pooling(features)
-        descriptors = F.normalize(pooled_features, p=2, dim=1)
+        descriptors = self.model(images)
         return descriptors
 
     def configure_optimizers(self):

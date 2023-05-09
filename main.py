@@ -17,6 +17,14 @@ from datasets.test_dataset import TestDataset
 from datasets.train_dataset import TrainDataset
 
 
+class GeM(torch.nn.Module):
+    def _init_(self, p=3, eps=1e-6):
+        super(GeM,self)._init_()
+        self.p = torch.nn.Parameter(torch.ones(1)*p)
+        self.eps = eps
+    def forward(self, x):
+        return torch.nn.functional.avg_pool2d(x.clamp(min=self.eps).pow(self.p), (x.size(-2), x.size(-1))).pow(1./self.p) 
+
 class LightningModel(pl.LightningModule):
     def __init__(self, val_dataset, test_dataset, descriptors_dim=512, num_preds_to_save=0, save_only_wrong_preds=True):
         super().__init__()
@@ -26,14 +34,18 @@ class LightningModel(pl.LightningModule):
         self.save_only_wrong_preds = save_only_wrong_preds
         # Use a pretrained model
         self.model = torchvision.models.resnet18(weights=torchvision.models.ResNet18_Weights.DEFAULT)
+        self.model.avgpool= GeM()
         # Change the output of the FC layer to the desired descriptors dimension
         self.model.fc = torch.nn.Linear(self.model.fc.in_features, descriptors_dim)
         # Set the loss function
         self.loss_fn = losses.ContrastiveLoss(pos_margin=0, neg_margin=1)
 
-    def forward(self, images):
-        descriptors = self.model(images)
-        return descriptors
+    def forward(self, x1, x2):
+        output1 = self.model(x1)
+        output2 = self.model(x2)
+        output1 = F.normalize(output1, dim=1)
+        output2 = F.normalize(output2, dim=1)
+        return output1, output2
 
     def configure_optimizers(self):
         optimizers = torch.optim.SGD(self.parameters(), lr=0.001, weight_decay=0.001, momentum=0.9)

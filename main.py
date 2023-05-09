@@ -22,6 +22,7 @@ class GeM(torch.nn.Module):
         super(GeM,self)._init_()
         self.p = torch.nn.Parameter(torch.ones(1)*p)
         self.eps = eps
+    
     def forward(self, x):
         return torch.nn.functional.avg_pool2d(x.clamp(min=self.eps).pow(self.p), (x.size(-2), x.size(-1))).pow(1./self.p) 
 
@@ -41,7 +42,9 @@ class LightningModel(pl.LightningModule):
         self.loss_fn = losses.ContrastiveLoss(pos_margin=0, neg_margin=1)
 
     def forward(self, images):
-        descriptors = self.model(images)
+        features = self.model(images)
+        pooled_features = self.pooling(features)
+        descriptors = F.normalize(pooled_features, p=2, dim=1)
         return descriptors
 
     def configure_optimizers(self):

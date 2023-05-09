@@ -40,12 +40,9 @@ class LightningModel(pl.LightningModule):
         # Set the loss function
         self.loss_fn = losses.ContrastiveLoss(pos_margin=0, neg_margin=1)
 
-    def forward(self, x1, x2):
-        output1 = self.model(x1)
-        output2 = self.model(x2)
-        output1 = F.normalize(output1, dim=1)
-        output2 = F.normalize(output2, dim=1)
-        return (output1, output2)
+    def forward(self, images):
+        descriptors = self.model(images)
+        return descriptors
 
     def configure_optimizers(self):
         optimizers = torch.optim.SGD(self.parameters(), lr=0.001, weight_decay=0.001, momentum=0.9)

@@ -9,6 +9,8 @@ def parse_arguments():
                         help="exp name")
     parser.add_argument("--checkpoint", type=str, default=None,
                         help="checkpoint path")
+    parser.add_argument("--parameter", type=float, default=3, 
+                        help="GeM pooling p parameter")
 
     # Training parameters
     parser.add_argument("--batch_size", type=int, default=64,

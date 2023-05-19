@@ -11,6 +11,8 @@ def parse_arguments():
                         help="checkpoint path")
     parser.add_argument("--parameter", type=float, default=3, 
                         help="GeM pooling p parameter")
+    parser.add_argument("--opt_param", type=str, default="sgd",
+                        help="set a optimizer algorithm")
 
     # Training parameters
     parser.add_argument("--batch_size", type=int, default=64,

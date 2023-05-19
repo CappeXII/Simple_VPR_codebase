@@ -9,10 +9,16 @@ def parse_arguments():
                         help="exp name")
     parser.add_argument("--checkpoint", type=str, default=None,
                         help="checkpoint path")
-    parser.add_argument("--parameter", type=float, default=3, 
-                        help="GeM pooling p parameter")
+    
+    # versioning parameter
     parser.add_argument("--opt_param", type=str, default="sgd",
                         help="set a optimizer algorithm")
+    parser.add_argument("--loss_param", type=str, default="cl",
+                        help="set the loss to use")
+    parser.add_argument("--pool_param", type=str, default=None,
+                        help="set the pooling layer")
+    parser.add_argument("--miner_param", type=str, default=None,
+                        help="set the miner to use")
 
     # Training parameters
     parser.add_argument("--batch_size", type=int, default=64,

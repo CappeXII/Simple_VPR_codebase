@@ -46,7 +46,16 @@ class LightningModel(pl.LightningModule):
         return descriptors
 
     def configure_optimizers(self):
-        optimizers = torch.optim.SGD(self.parameters(), lr=0.001, weight_decay=0.001, momentum=0.9)
+        if self.opt_param == "sgd":
+            optimizers = torch.optim.SGD(self.parameters(), lr=0.001, weight_decay=0.001, momentum=0.9)
+        elif self.opt_param == "adam":
+            optimizers = torch.optim.Adam(self.parameters(), lr=0.0001, betas=(0.9, 0.999), eps=1e-08, weight_decay=0)
+        elif self.opt_param == "adamw":
+            optimizers = torch.optim.AdamW(self.parameters(), lr=0.0001, betas=(0.9, 0.999), eps=1e-08, weight_decay=0.01)
+        elif self.opt_param == "AdaMax":
+            optimizers = torch.optim.Adamax(self.parameters, lr=0.002, betas=(0.9, 0.999), eps=1e-08, weight_decay=0)
+        elif self.opt_param == "AMSGrad":
+            optimizers = torch.optim.Adam(self.parameters(), lr=0.0001, betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=True)
         return optimizers
 
     #  The loss function call (this method will be called at each training iteration)

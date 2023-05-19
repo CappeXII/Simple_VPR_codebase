@@ -33,6 +33,7 @@ class LightningModel(pl.LightningModule):
         self.test_dataset = test_dataset
         self.num_preds_to_save = num_preds_to_save
         self.save_only_wrong_preds = save_only_wrong_preds
+        self.opt_param=opt_param
         # Use a pretrained model
         self.model = torchvision.models.resnet18(weights=torchvision.models.ResNet18_Weights.DEFAULT)
         self.model.avgpool= GeM()

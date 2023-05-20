@@ -27,7 +27,7 @@ class GeM(torch.nn.Module):
         return torch.nn.functional.avg_pool2d(x.clamp(min=self.eps).pow(self.p), (x.size(-2), x.size(-1))).pow(1./self.p) 
 
 class LightningModel(pl.LightningModule):
-    def __init__(self, val_dataset, test_dataset, descriptors_dim=512, num_preds_to_save=0, save_only_wrong_preds=True, opt_param="sgd", loss_param="cl", pool_param="", miner_param="", p_param=2.5):
+    def __init__(self, val_dataset, test_dataset, descriptors_dim=512, num_preds_to_save=0, save_only_wrong_preds=True, opt_param="sgd", loss_param="cl", pool_param="", miner_param="", p_param=2.5, alpha_param=40):
         super().__init__()
         self.val_dataset = val_dataset
         self.test_dataset = test_dataset
@@ -37,6 +37,7 @@ class LightningModel(pl.LightningModule):
         self.loss_param=loss_param
         self.pool_param=pool_param
         self.miner_param=miner_param
+        self.alpha_param=alpha_param
         # Use a pretrained model
         self.model = torchvision.models.resnet18(weights=torchvision.models.ResNet18_Weights.DEFAULT)
         #set pooling
@@ -51,7 +52,7 @@ class LightningModel(pl.LightningModule):
             self.loss_fn = losses.AngularLoss(alpha=55)
         #set miner
         if self.miner_param == "am":
-            self.miner=miners.AngularMiner(angle=20)
+            self.miner=miners.AngularMiner(angle=self.alpha_param)
 
     def forward(self, images):
         descriptors = self.model(images)
@@ -150,7 +151,7 @@ if __name__ == '__main__':
     utils.setup_logging(join('logs', 'lightning_logs', args.exp_name), console='info')
 
     train_dataset, val_dataset, test_dataset, train_loader, val_loader, test_loader = get_datasets_and_dataloaders(args)
-    model = LightningModel(val_dataset, test_dataset, args.descriptors_dim, args.num_preds_to_save, args.save_only_wrong_preds, args.opt_param, args.loss_param, args.pool_param, args.miner_param, args.p_param)
+    model = LightningModel(val_dataset, test_dataset, args.descriptors_dim, args.num_preds_to_save, args.save_only_wrong_preds, args.opt_param, args.loss_param, args.pool_param, args.miner_param, args.p_param, args.alpha_param)
     
     # Model params saving using Pytorch Lightning. Save the best 3 models according to Recall@1
     checkpoint_cb = ModelCheckpoint(

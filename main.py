@@ -71,8 +71,8 @@ class LightningModel(pl.LightningModule):
         return optimizers
 
     #  The loss function call (this method will be called at each training iteration)
-    def loss_function(self, descriptors, labels):
-        loss = self.loss_fn(descriptors, labels)
+    def loss_function(self, descriptors, labels, triplets):
+        loss = self.loss_fn(descriptors, labels, triplets)
         return loss
 
     # This is the training step that's executed at each iteratio

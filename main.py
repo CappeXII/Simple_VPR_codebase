@@ -46,6 +46,8 @@ class LightningModel(pl.LightningModule):
         # Set the loss function
         if self.loss_param == "cl":
             self.loss_fn = losses.ContrastiveLoss(pos_margin=0, neg_margin=1)
+        elif self.loss_param == "al":
+            self.loss_fn = losses.AngularLoss(alpha=55)
 
     def forward(self, images):
         descriptors = self.model(images)

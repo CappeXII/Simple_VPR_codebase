@@ -21,7 +21,8 @@ def parse_arguments():
                         help="set the miner to use")
     parser.add_argument("--p_param", type=float, default=2.5,
                         help="set the parameter of the GeM pooling")
-
+    parser.add_argument("--alpha_param", type=float, default=40,
+                        help="set the parameter of the Angular loss")
     # Training parameters
     parser.add_argument("--batch_size", type=int, default=64,
                         help="The number of places to use per iteration (one place is N images)")

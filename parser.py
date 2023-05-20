@@ -19,7 +19,7 @@ def parse_arguments():
                         help="set the pooling layer")
     parser.add_argument("--miner_param", type=str, default=None,
                         help="set the miner to use")
-    parser.add_argument("--p_param", type=str, default=2.5,
+    parser.add_argument("--p_param", type=float, default=2.5,
                         help="set the parameter of the GeM pooling")
 
     # Training parameters

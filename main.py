@@ -4,7 +4,7 @@ import numpy as np
 import torchvision.models
 import pytorch_lightning as pl
 from torchvision import transforms as tfm
-from pytorch_metric_learning import losses
+from pytorch_metric_learning import miners, losses
 from torch.utils.data.dataloader import DataLoader
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning import loggers as pl_loggers
@@ -39,6 +39,7 @@ class LightningModel(pl.LightningModule):
         self.miner_param=miner_param
         # Use a pretrained model
         self.model = torchvision.models.resnet18(weights=torchvision.models.ResNet18_Weights.DEFAULT)
+        #set pooling
         if self.pool_param == "gem":
             self.model.avgpool= GeM(p=p_param)
         # Change the output of the FC layer to the desired descriptors dimension
@@ -48,6 +49,9 @@ class LightningModel(pl.LightningModule):
             self.loss_fn = losses.ContrastiveLoss(pos_margin=0, neg_margin=1)
         elif self.loss_param == "al":
             self.loss_fn = losses.AngularLoss(alpha=55)
+        #set miner
+        if self.miner_param == "am":
+            self.miner=miners.AngularMiner(angle=20)
 
     def forward(self, images):
         descriptors = self.model(images)
@@ -80,7 +84,8 @@ class LightningModel(pl.LightningModule):
 
         # Feed forward the batch to the model
         descriptors = self(images)  # Here we are calling the method forward that we defined above
-        loss = self.loss_function(descriptors, labels)  # Call the loss_function we defined above
+        triplets = self.miner(descriptors, labels)
+        loss = self.loss_function(descriptors, labels, triplets)  # Call the loss_function we defined above
         
         self.log('loss', loss.item(), logger=True)
         return {'loss': loss}

@@ -75,7 +75,7 @@ class LightningModel(pl.LightningModule):
         loss = self.loss_fn(descriptors, labels)
         return loss
 
-    # This is the training step that's executed at each iteration
+    # This is the training step that's executed at each iteratio
     def training_step(self, batch, batch_idx):
         images, labels = batch
         num_places, num_images_per_place, C, H, W = images.shape

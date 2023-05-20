@@ -18,7 +18,7 @@ from datasets.train_dataset import TrainDataset
 
 
 class GeM(torch.nn.Module):
-    def __init__(self, p=2.5, eps=1e-6):
+    def __init__(self, p, eps=1e-6):
         super(GeM,self).__init__()
         self.p = torch.nn.Parameter(torch.ones(1)*p)
         self.eps = eps
@@ -27,7 +27,7 @@ class GeM(torch.nn.Module):
         return torch.nn.functional.avg_pool2d(x.clamp(min=self.eps).pow(self.p), (x.size(-2), x.size(-1))).pow(1./self.p) 
 
 class LightningModel(pl.LightningModule):
-    def __init__(self, val_dataset, test_dataset, descriptors_dim=512, num_preds_to_save=0, save_only_wrong_preds=True, opt_param="sgd", loss_param="cl", pool_param="", miner_param=""):
+    def __init__(self, val_dataset, test_dataset, descriptors_dim=512, num_preds_to_save=0, save_only_wrong_preds=True, opt_param="sgd", loss_param="cl", pool_param="", miner_param="", p_param):
         super().__init__()
         self.val_dataset = val_dataset
         self.test_dataset = test_dataset
@@ -40,7 +40,7 @@ class LightningModel(pl.LightningModule):
         # Use a pretrained model
         self.model = torchvision.models.resnet18(weights=torchvision.models.ResNet18_Weights.DEFAULT)
         if self.pool_param == "gem":
-            self.model.avgpool= GeM()
+            self.model.avgpool= GeM(p=p_param)
         # Change the output of the FC layer to the desired descriptors dimension
         self.model.fc = torch.nn.Linear(self.model.fc.in_features, descriptors_dim)
         # Set the loss function
@@ -143,7 +143,7 @@ if __name__ == '__main__':
     utils.setup_logging(join('logs', 'lightning_logs', args.exp_name), console='info')
 
     train_dataset, val_dataset, test_dataset, train_loader, val_loader, test_loader = get_datasets_and_dataloaders(args)
-    model = LightningModel(val_dataset, test_dataset, args.descriptors_dim, args.num_preds_to_save, args.save_only_wrong_preds, args.opt_param, args.loss_param, args.pool_param, args.miner_param)
+    model = LightningModel(val_dataset, test_dataset, args.descriptors_dim, args.num_preds_to_save, args.save_only_wrong_preds, args.opt_param, args.loss_param, args.pool_param, args.miner_param, args.p_param)
     
     # Model params saving using Pytorch Lightning. Save the best 3 models according to Recall@1
     checkpoint_cb = ModelCheckpoint(

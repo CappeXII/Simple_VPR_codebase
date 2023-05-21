@@ -50,7 +50,7 @@ class LightningModel(pl.LightningModule):
             self.loss_fn = losses.ContrastiveLoss(pos_margin=0, neg_margin=1)
         elif self.loss_param == "al": #good with anuglar miner
             self.loss_fn = losses.AngularLoss(alpha=55)
-        elif self.loss_param == "cl": #good with batch hard miner
+        elif self.loss_param == "cil": #good with batch hard miner
             self.loss_fn = losses.CircleLoss(m=0.4, gamma=80)
         elif self.loss_param == "il": #dinstance weighted miner
             self.loss_fn=losses.InstanceLoss(gamma=64)

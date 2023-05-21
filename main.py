@@ -48,11 +48,20 @@ class LightningModel(pl.LightningModule):
         # Set the loss function
         if self.loss_param == "cl":
             self.loss_fn = losses.ContrastiveLoss(pos_margin=0, neg_margin=1)
-        elif self.loss_param == "al":
+        elif self.loss_param == "al": #good with anuglar miner
             self.loss_fn = losses.AngularLoss(alpha=55)
+        elif self.loss_param == "cl": #good with batch hard miner
+            self.loss_fn = losses.CircleLoss(m=0.4, gamma=80)
+        elif self.loss_param == "il": #dinstance weighted miner
+            self.loss_fn=losses.InstanceLoss(gamma=64)
+            
         #set miner
         if self.miner_param == "am":
             self.miner=miners.AngularMiner(angle=self.alpha_param)
+        elif self.miner_param == "bhm":
+            self.miner = miners.BatchHardMiner()
+        elif self.miner_param == "dwm":
+            self.miner = miners.DistanceWeightedMiner(cutoff=0.5, nonzero_loss_cutoff=1.4)
 
     def forward(self, images):
         descriptors = self.model(images)

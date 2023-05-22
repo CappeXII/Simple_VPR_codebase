@@ -22,7 +22,7 @@ if __name__ == '__main__':
     utils.setup_logging(join('logs', args.exp_name), console='info')
 
     val_dataset, test_dataset, val_loader, test_loader = get_datasets_and_dataloaders(args)
-    model = LightningModel(val_dataset, test_dataset, args.descriptors_dim, args.num_preds_to_save, args.save_only_wrong_preds)
+    model = LightningModel(val_dataset, test_dataset, args.descriptors_dim, args.num_preds_to_save, args.save_only_wrong_preds, args.opt_param, args.loss_param, args.pool_param, args.miner_param, args.p_param, args.alpha_param)
     
     tb_logger = pl_loggers.TensorBoardLogger(save_dir="logs/", version=args.exp_name)
     # Instantiate a trainer
